@@ -17,35 +17,35 @@ std::string encode(const char * bytes_to_encode, std::size_t in_len) {
 	std::string ret;
 	uint i = 0;
 	uint j = 0;
-	unsigned char char_array_3[3];
-	unsigned char char_array_4[4];
+	unsigned char in[3];
+	unsigned char out[4];
 
 	while (in_len--) {
-		char_array_3[i++] = *(bytes_to_encode++);
+		in[i++] = *(bytes_to_encode++);
 		if (i == 3) {
-			char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-			char_array_4[1] = static_cast<unsigned char>(((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4));
-			char_array_4[2] = static_cast<unsigned char>(((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6));
-			char_array_4[3] = char_array_3[2] & 0x3f;
+			out[0] = (in[0] & 0xfc) >> 2;
+			out[1] = static_cast<unsigned char>(((in[0] & 0x03) << 4) + ((in[1] & 0xf0) >> 4));
+			out[2] = static_cast<unsigned char>(((in[1] & 0x0f) << 2) + ((in[2] & 0xc0) >> 6));
+			out[3] = in[2] & 0x3f;
 
-			for(i = 0; (i <4) ; i++)
-				ret += base64_chars[char_array_4[i]];
+			for (i = 0; i < 4; i++)
+				ret += base64_chars[out[i]];
 			i = 0;
 		}
 	}
 
 	if (i) {
 		for(j = i; j < 3; j++)
-			char_array_3[j] = '\0';
+			in[j] = '\0';
 
-		char_array_4[0] = ( char_array_3[0] & 0xfc) >> 2;
-		char_array_4[1] = static_cast<unsigned char>(((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4));
-		char_array_4[2] = static_cast<unsigned char>(((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6));
+		out[0] = (in[0] & 0xfc) >> 2;
+		out[1] = static_cast<unsigned char>(((in[0] & 0x03) << 4) + ((in[1] & 0xf0) >> 4));
+		out[2] = static_cast<unsigned char>(((in[1] & 0x0f) << 2) + ((in[2] & 0xc0) >> 6));
 
 		for (j = 0; (j <= i); j++)
-			ret += base64_chars[char_array_4[j]];
+			ret += base64_chars[out[j]];
 
-		while((i++ < 3))
+		while ((i++ < 3))
 			ret += '=';
 	}
 
@@ -58,34 +58,35 @@ std::string decode(const char * bytes_to_decode, std::size_t in_len) {
 	uint i = 0;
 	uint j = 0;
 	int in_ = 0;
-	unsigned char char_array_4[4], char_array_3[3];
+	unsigned char in[4]
+	unsigned char out[3];
 
 
 	while (in_len-- && ( bytes_to_decode[in_] != '=') && is_base64(bytes_to_decode[in_])) {
-		char_array_4[i++] = bytes_to_decode[in_]; in_++;
-		if (i ==4) {
-			for (i = 0; i <4; i++)
-				char_array_4[i] = static_cast<unsigned char>(base64_chars.find(char_array_4[i]));
+		in[i++] = bytes_to_decode[in_]; in_++;
+		if (i == 4) {
+			for (i = 0; i < 4; i++)
+				in[i] = static_cast<unsigned char>(base64_chars.find(in[i]));
 
-			char_array_3[0] = static_cast<unsigned char>(( char_array_4[0] << 2       ) + ((char_array_4[1] & 0x30) >> 4));
-			char_array_3[1] = static_cast<unsigned char>(((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2));
-			char_array_3[2] = static_cast<unsigned char>(((char_array_4[2] & 0x3) << 6) +   char_array_4[3]);
+			out[0] = static_cast<unsigned char>(( in[0] << 2       ) + ((in[1] & 0x30) >> 4));
+			out[1] = static_cast<unsigned char>(((in[1] & 0xf) << 4) + ((in[2] & 0x3c) >> 2));
+			out[2] = static_cast<unsigned char>(((in[2] & 0x3) << 6) +   in[3]);
 
-			for (i = 0; (i < 3); i++)
-				ret += char_array_3[i];
+			for (i = 0; i < 3; i++)
+				ret += out[i];
 			i = 0;
 		}
 	}
 
 	if (i) {
 		for (j = 0; j < i; j++)
-			char_array_4[j] = static_cast<unsigned char>(base64_chars.find(char_array_4[j]));
+			in[j] = static_cast<unsigned char>(base64_chars.find(in[j]));
 
-		char_array_3[0] = static_cast<unsigned char>((char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4));
-		char_array_3[1] = static_cast<unsigned char>(((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2));
+		out[0] = static_cast<unsigned char>((in[0] << 2) + ((in[1] & 0x30) >> 4));
+		out[1] = static_cast<unsigned char>(((in[1] & 0xf) << 4) + ((in[2] & 0x3c) >> 2));
 
 		for (j = 0; (j < i - 1); j++)
-			ret += char_array_3[j];
+			ret += out[j];
 	}
 
 	return ret;
