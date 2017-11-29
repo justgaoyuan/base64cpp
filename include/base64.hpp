@@ -10,6 +10,6 @@ namespace base64 {
 	std::string encode(const std::string & );
 	std::string decode(const std::string & );
 
-	void save_base64(const char * path, const std::string & base64_str);
-
+	void save(const char * path, const std::string & base64_str);
+	void load(const char * path, std::string & content);
 }

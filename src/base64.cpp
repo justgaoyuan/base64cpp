@@ -58,7 +58,7 @@ std::string decode(const char * bytes_to_decode, std::size_t in_len) {
 	uint i = 0;
 	uint j = 0;
 	int in_ = 0;
-	unsigned char in[4]
+	unsigned char in[4];
 	unsigned char out[3];
 
 
@@ -94,20 +94,38 @@ std::string decode(const char * bytes_to_decode, std::size_t in_len) {
 
 std::string encode(const std::string & src)
 {
-  return encode(src.c_str(), src.length());
+	return encode(src.c_str(), src.length());
 }
 
 std::string decode(const std::string & src)
 {
-  return decode(src.c_str(), src.length());
+	return decode(src.c_str(), src.length());
 }
 
 
-void save_base64(const char * path, const std::string & base64_str)
+void save(const char * path, const std::string & content)
 {
-	std::ofstream file(path, std::ios::trunc | std::ios::binary);
-	file.write(base64_str.c_str(), base64_str.length());
+	std::ofstream file(path, std::ios::trunc | std::ios::binary | std::ios::out);
+
+	file.write(content.c_str(), content.length());
 	file.close();
+}
+
+void load(const char * path, std::string & content)
+{
+	const static int BUFFSIZE = 1024;
+	char* buff = new char[BUFFSIZE];
+	std::ifstream file(path, std::ios::binary | std::ios::in);
+
+	content.clear();
+	do {
+		file.read(buff, BUFFSIZE);
+		std::size_t size = file.gcount();
+		content.append(buff, size);
+	} while (file.good());
+	file.close();
+
+	delete [] buff;
 }
 
 }
